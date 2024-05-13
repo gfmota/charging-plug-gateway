@@ -6,7 +6,7 @@ plugins {
 	id 'pmd'
 }
 
-group = 'com.template'
+group = 'com.charging-plug-gateway'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.1'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -39,6 +40,7 @@ checkstyle {
 
 pmd {
 	toolVersion '6.50.0'
+	ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
 tasks.named('test') {
