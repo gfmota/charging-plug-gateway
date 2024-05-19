@@ -1,5 +1,6 @@
 package com.template.template.domain.usecases;
 
+import com.template.template.domain.entity.ChargingPlugStationCurrentStatus;
 import com.template.template.domain.entity.ChargingPlugStationRecord;
 import com.template.template.domain.gateways.ChargingPlugRecordGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +21,9 @@ public class ChargingPlugRecordUsecase {
     public ChargingPlugStationRecord getChargingPlugRecordFromLastDay() {
         final LocalDateTime now = LocalDateTime.now();
         return chargingPlugRecordGateway.getChargingPlugStationDataRecord(now.minusDays(1), now);
+    }
+
+    public ChargingPlugStationCurrentStatus getChargingPlugCurrentStatus() {
+        return chargingPlugRecordGateway.getChargingPlugStationCurrentStatus();
     }
 }

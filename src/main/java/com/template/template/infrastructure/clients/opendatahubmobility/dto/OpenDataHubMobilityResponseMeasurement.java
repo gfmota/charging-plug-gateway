@@ -18,6 +18,6 @@ public class OpenDataHubMobilityResponseMeasurement {
         @JsonProperty("mvalue")
         private Boolean value;
         @JsonProperty("mvalidtime")
-        private LocalDateTime moment;
+        private String moment;
     }
 }

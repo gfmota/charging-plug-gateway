@@ -10,9 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -24,8 +25,10 @@ public class ChargingPlugDataHubGateway implements ChargingPlugRecordGateway {
     public ChargingPlugStationRecord getChargingPlugStationDataRecord(
             final LocalDateTime from, final LocalDateTime to) {
         try {
+
             final OpenDataHubMobilityResponseDTO response =
-                    openDataHubMobilityClient.getReportFromTimeRange(from.toString(), to.toString());
+                    openDataHubMobilityClient.getReportFromTimeRange(getStringFromLocalDateTime(from),
+                            getStringFromLocalDateTime(to));
             final var chargingPlugStationRecord = new ChargingPlugStationRecord();
             chargingPlugStationRecord.setTo(to);
             chargingPlugStationRecord.setFrom(from);
@@ -35,6 +38,52 @@ public class ChargingPlugDataHubGateway implements ChargingPlugRecordGateway {
             log.warn("Failed to get data from interval {} - {}", from.toString(), to.toString(), e);
             return null;
         }
+    }
+
+    @Override
+    public ChargingPlugStationCurrentStatus getChargingPlugStationCurrentStatus() {
+        try {
+            final OpenDataHubMobilityResponseDTO response = openDataHubMobilityClient.getLatestReport();
+            final var chargingPlugStationCurrentStatus = new ChargingPlugStationCurrentStatus();
+            chargingPlugStationCurrentStatus.setMoment(LocalDateTime.now());
+            chargingPlugStationCurrentStatus.setStations(
+                    mapResponseDtoToChargingPlugStationCurrentStatusList(response));
+            return chargingPlugStationCurrentStatus;
+        } catch (Exception e) {
+            log.warn("Failed to get latest data", e);
+            return null;
+        }
+    }
+
+    private List<ChargingPlugStationStatus> mapResponseDtoToChargingPlugStationCurrentStatusList(
+            final OpenDataHubMobilityResponseDTO responseDto) {
+        final var res = new ArrayList<ChargingPlugStationStatus>();
+        responseDto.getData().getChargingPlug().getStations().entrySet().forEach(
+                entry -> {
+                    final String stationId = parseStationId(entry.getKey());
+                    boolean stationFound = false;
+                    for (final var station : res) {
+                        if (Objects.equals(station.id(), stationId)) {
+                            station.plugs().put(entry.getKey(), entry.getValue().getDataTypes().getStatus()
+                                    .getMeasurements().get(0).getValue()
+                                    ? ChargingPlugStatus.AVAILABLE : ChargingPlugStatus.UNAVAILABLE);
+                            stationFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!stationFound) {
+                        final var position = new Coordinates(entry.getValue().getCoordinate().getX(),
+                                entry.getValue().getCoordinate().getY());
+                        final var plugs = new HashMap<String, ChargingPlugStatus>();
+                        plugs.put(entry.getKey(),
+                                entry.getValue().getDataTypes().getStatus().getMeasurements().get(0).getValue()
+                                        ? ChargingPlugStatus.AVAILABLE : ChargingPlugStatus.UNAVAILABLE);
+                        res.add(new ChargingPlugStationStatus(stationId, position, plugs));
+                    }
+                }
+        );
+        return res;
     }
 
     private List<ChargingPlugStation> mapResponseDtoToChargingPlugStationList(
@@ -59,7 +108,7 @@ public class ChargingPlugDataHubGateway implements ChargingPlugRecordGateway {
                 if (!stationFound) {
                     final var position = new Coordinates(entry.getValue().getCoordinate().getX(),
                             entry.getValue().getCoordinate().getY());
-                    res.add(new ChargingPlugStation(entry.getKey(), position, List.of(plug)));
+                    res.add(new ChargingPlugStation(stationId, position, List.of(plug)));
                 }
             }
         );
@@ -67,16 +116,37 @@ public class ChargingPlugDataHubGateway implements ChargingPlugRecordGateway {
     }
 
     private String parseStationId(final String input) {
-        final int secondDashIndex = input.indexOf('-', input.indexOf('-') + 1);
+        final int firstDashIndex = input.indexOf('-');
+        final int secondDashIndex = input.indexOf('-', firstDashIndex + 1);
         if (secondDashIndex != -1) {
             return input.substring(0, secondDashIndex);
+        }
+        if (firstDashIndex != -1) {
+            return input.substring(0, firstDashIndex);
         }
         return input;
     }
 
     private ChargingPlugRecord mapMeasurementToChargingPlugRecord(
             final OpenDataHubMobilityResponseMeasurement.Measurement measurement) {
-        return new ChargingPlugRecord(measurement.getMoment(), measurement.getValue()
+        return new ChargingPlugRecord(getLocalDateTimeFromString(measurement.getMoment()), measurement.getValue()
                 ? ChargingPlugStatus.AVAILABLE : ChargingPlugStatus.UNAVAILABLE);
+    }
+
+    private LocalDateTime getLocalDateTimeFromString(final String input) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSZ");
+        try {
+            return LocalDateTime.parse(input, formatter);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String getStringFromLocalDateTime(final LocalDateTime input) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        ZonedDateTime zonedDateTimeInput = ZonedDateTime.of(input, zoneId);
+        return zonedDateTimeInput.format(formatter);
     }
 }
