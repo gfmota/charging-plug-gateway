@@ -22,6 +22,18 @@ services:
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    environment:
+      - RABBITMQ_USER:user
+      - RABBITMQ_PASSWORD:pass
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq/
 
 volumes:
+  rabbitmq:
   prometheus_data:
