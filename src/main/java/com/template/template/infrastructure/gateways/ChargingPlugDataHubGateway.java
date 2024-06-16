@@ -5,6 +5,8 @@ import com.template.template.domain.gateways.ChargingPlugRecordGateway;
 import com.template.template.infrastructure.clients.opendatahubmobility.OpenDataHubMobilityClient;
 import com.template.template.infrastructure.clients.opendatahubmobility.dto.OpenDataHubMobilityResponseDTO;
 import com.template.template.infrastructure.clients.opendatahubmobility.dto.OpenDataHubMobilityResponseMeasurement;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,12 +20,29 @@ import java.util.*;
 @Service
 @Slf4j
 public class ChargingPlugDataHubGateway implements ChargingPlugRecordGateway {
-    @Autowired
     private OpenDataHubMobilityClient openDataHubMobilityClient;
+    private MeterRegistry meterRegistry;
+    private Counter openDataHubLatestCounter;
+    private Counter openDataHubTimeRangeCounter;
+
+    @Autowired
+    public ChargingPlugDataHubGateway(OpenDataHubMobilityClient openDataHubMobilityClient, MeterRegistry meterRegistry) {
+        this.openDataHubMobilityClient = openDataHubMobilityClient;
+        this.meterRegistry = meterRegistry;
+
+        openDataHubTimeRangeCounter = Counter.builder("open_data_hub_report_counter")
+                .description("Number of requests sent to /v2/tree%2Cnode/EChargingPlug/%2A/{from}/{to}?limit=200&offset=0&where=sorigin.eq.%22DRIWE%22&shownull=false&distinct=true&timezone=UTC Open Data Hub endpoint")
+                .register(meterRegistry);
+
+        openDataHubLatestCounter = Counter.builder("open_data_hub_last_status_counter")
+                .description("Number of requests sent to /v2/tree%2Cnode/EChargingPlug/%2A/latest?limit=200&offset=0&where=sorigin.eq.%22DRIWE%22&shownull=false&distinct=true&timezone=UTC Open Data Hub endpoint")
+                .register(meterRegistry);
+    }
 
     @Override
     public ChargingPlugStationRecord getChargingPlugStationDataRecord(
             final LocalDateTime from, final LocalDateTime to) {
+        openDataHubTimeRangeCounter.increment();
         try {
 
             final OpenDataHubMobilityResponseDTO response =
@@ -42,6 +61,7 @@ public class ChargingPlugDataHubGateway implements ChargingPlugRecordGateway {
 
     @Override
     public ChargingPlugStationCurrentStatus getChargingPlugStationCurrentStatus() {
+        openDataHubLatestCounter.increment();
         try {
             final OpenDataHubMobilityResponseDTO response = openDataHubMobilityClient.getLatestReport();
             final var chargingPlugStationCurrentStatus = new ChargingPlugStationCurrentStatus();
