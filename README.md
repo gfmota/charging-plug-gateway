@@ -13,7 +13,7 @@ This is a Spring Boot application using:
 * Spring WebClient to write non-blocking concurrent HTTP clients
 * RabbitMQ as asynchronous messaging broker
 * Spring Boot Actuator to provide metrics data
-* Prometheus to query within metrics
+* Prometheus to store metrics data
 * Grafana to display metrics data
 
 ## Monitoring
