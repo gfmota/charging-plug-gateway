@@ -11,5 +11,18 @@ see more details of each on [Pull Requests](https://github.com/gfmota/charging-p
 This is a Spring Boot application using:
 * Feign Client to write simple HTTP clients
 * Spring WebClient to write non-blocking concurrent HTTP clients
-* Spring Boot Actuator to monitor the application
 * RabbitMQ as asynchronous messaging broker
+* Spring Boot Actuator to provide metrics data
+* Prometheus to query within metrics
+* Grafana to display metrics data
+
+## Monitoring
+
+To monitor the application you may run the docker-compose file 
+```
+docker-compose up
+```
+And then you can access Prometheus at `localhost:9090` and make custom queries with the data from Actuator.
+Or you can access Grafana at `localhost:3000`, credentials `admin`/`admin`, to use the dashboards with graphs and displays.
+
+The Grafana dashboard used to track what this experiment intends is defined at `./grafana-dash.json`
