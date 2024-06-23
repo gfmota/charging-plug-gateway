@@ -3,7 +3,11 @@ package com.template.template.infrastructure.clients;
 import com.template.template.domain.entity.ChargingPlugStationCurrentStatus;
 import com.template.template.domain.entity.ChargingPlugStationRecord;
 import com.template.template.domain.gateways.ChargingPlugNotificationGateway;
+import com.template.template.infrastructure.clients.opendatahubmobility.OpenDataHubMobilityClient;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -13,9 +17,24 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class WebClientNotificationManager implements ChargingPlugNotificationGateway {
+    private Counter currentStatusNotificationCounter;
+    private Counter dailyReportNotificationCounter;
+
+    @Autowired
+    public WebClientNotificationManager(MeterRegistry meterRegistry) {
+        currentStatusNotificationCounter = Counter.builder("current_status_notification_counter")
+                .description("Number of requests sent to /v2/tree%2Cnode/EChargingPlug/%2A/{from}/{to}?limit=200&offset=0&where=sorigin.eq.%22DRIWE%22&shownull=false&distinct=true&timezone=UTC Open Data Hub endpoint")
+                .register(meterRegistry);
+
+        dailyReportNotificationCounter = Counter.builder("daily_report_notification_counter")
+                .description("Number of requests sent to /v2/tree%2Cnode/EChargingPlug/%2A/latest?limit=200&offset=0&where=sorigin.eq.%22DRIWE%22&shownull=false&distinct=true&timezone=UTC Open Data Hub endpoint")
+                .register(meterRegistry);
+    }
+
     @Override
     public void notifyChargingPlugStationCurrentStatus(final String path, final String uri,
                                                        final ChargingPlugStationCurrentStatus notification) {
+        currentStatusNotificationCounter.increment();
         WebClient.create(path)
                 .post()
                 .uri(uri)
@@ -42,6 +61,7 @@ public class WebClientNotificationManager implements ChargingPlugNotificationGat
     @Override
     public void notifyChargingPlugStationDailyReport(final String path, final String uri,
                                                      final ChargingPlugStationRecord notification) {
+        dailyReportNotificationCounter.increment();
         WebClient.create(path)
                 .post()
                 .uri(uri)
