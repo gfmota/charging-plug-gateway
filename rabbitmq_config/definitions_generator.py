@@ -82,7 +82,7 @@ def generate_definitions_json(n):
             "vhost": "/",
             "destination": current_status_queue_name,
             "destination_type": "queue",
-            "routing_key": f"charging-plug-station-current-status-{i}",
+            "routing_key": f"charging-plug-station-current-status",
             "arguments": {}
         }
         definitions["bindings"].append(current_status_binding_entry)
@@ -92,7 +92,7 @@ def generate_definitions_json(n):
             "vhost": "/",
             "destination": daily_report_queue_name,
             "destination_type": "queue",
-            "routing_key": f"charging-plug-station-daily-report-{i}",
+            "routing_key": f"charging-plug-station-daily-report",
             "arguments": {}
         }
         definitions["bindings"].append(daily_report_binding_entry)
