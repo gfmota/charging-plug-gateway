@@ -25,14 +25,17 @@ services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
     restart: always
-    environment:
-      - RABBITMQ_USER:user
-      - RABBITMQ_PASSWORD:pass
     ports:
       - "5672:5672"
       - "15672:15672"
     volumes:
       - rabbitmq:/var/lib/rabbitmq/
+#      - ./rabbitmq_config:/etc/rabbitmq
+      - ./rabbitmq_config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq_config/definitions.json:/etc/rabbitmq/definitions.json:ro
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 
 volumes:
   rabbitmq:
