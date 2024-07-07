@@ -3,7 +3,6 @@ package com.template.template.infrastructure.clients;
 import com.template.template.domain.entity.ChargingPlugStationCurrentStatus;
 import com.template.template.domain.entity.ChargingPlugStationRecord;
 import com.template.template.domain.gateways.ChargingPlugNotificationGateway;
-import com.template.template.infrastructure.clients.opendatahubmobility.OpenDataHubMobilityClient;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -19,15 +18,20 @@ import reactor.core.publisher.Mono;
 public class WebClientNotificationManager implements ChargingPlugNotificationGateway {
     private Counter currentStatusNotificationCounter;
     private Counter dailyReportNotificationCounter;
+    private Counter hourlyReportNotificationCounter;
 
     @Autowired
     public WebClientNotificationManager(MeterRegistry meterRegistry) {
         currentStatusNotificationCounter = Counter.builder("current_status_notification_counter")
-                .description("Number of requests sent to /v2/tree%2Cnode/EChargingPlug/%2A/{from}/{to}?limit=200&offset=0&where=sorigin.eq.%22DRIWE%22&shownull=false&distinct=true&timezone=UTC Open Data Hub endpoint")
+                .description("Number of notifications (requests) made about current status")
                 .register(meterRegistry);
 
         dailyReportNotificationCounter = Counter.builder("daily_report_notification_counter")
-                .description("Number of requests sent to /v2/tree%2Cnode/EChargingPlug/%2A/latest?limit=200&offset=0&where=sorigin.eq.%22DRIWE%22&shownull=false&distinct=true&timezone=UTC Open Data Hub endpoint")
+                .description("Number of notifications (requests) made about daily report")
+                .register(meterRegistry);
+
+        hourlyReportNotificationCounter = Counter.builder("hourly_report_notification_counter")
+                .description("Number of notifications (requests) made about hourly report")
                 .register(meterRegistry);
     }
 
@@ -83,5 +87,30 @@ public class WebClientNotificationManager implements ChargingPlugNotificationGat
                 })
                 .subscribe();
 
+    }
+
+    @Override
+    public void notifyChargingPlugStationHourlyReport(String path, String uri, ChargingPlugStationRecord notification) {
+        hourlyReportNotificationCounter.increment();
+        WebClient.create(path)
+                .post()
+                .uri(uri)
+                .accept(MediaType.ALL)
+                .bodyValue(notification)
+                .retrieve()
+                .onStatus(HttpStatusCode::is2xxSuccessful, clientResponse -> {
+                    log.info("Charging plug station hourly sent to " + path + uri);
+                    return Mono.empty();
+                })
+                .onStatus(HttpStatusCode::isError, clientResponse -> {
+                    log.error("Error sending charging plug station hourly to " + path + uri);
+                    return Mono.empty();
+                })
+                .bodyToMono(Void.class)
+                .onErrorResume(throwable -> {
+                    log.error("Error connecting to subscriber " + path);
+                    return Mono.empty();
+                })
+                .subscribe();
     }
 }

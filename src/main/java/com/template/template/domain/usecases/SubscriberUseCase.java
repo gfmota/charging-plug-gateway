@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +65,22 @@ public class SubscriberUseCase {
 
         final ChargingPlugStationRecord recordFromLastDay =
                 chargingPlugRecordUsecase.getChargingPlugRecordFromLastDay().orElseThrow(IOException::new);
+
+        subscribersPath.forEach(subscriber -> {
+            chargingPlugNotificationGateway.notifyChargingPlugStationDailyReport(subscriber.getPath(),
+                    subscriber.getUri(), recordFromLastDay);
+        });
+    }
+
+    @Scheduled(cron = "30 * * * * ?")
+//    @Scheduled(cron = "0 0 1 * * ?")
+    private void notifyHourlySubscribers() throws IOException {
+        log.info("Notifying hourly report subscribers");
+        final ChargingPlugStationRecord recordFromLastDay =
+                chargingPlugRecordUsecase.getChargingPlugRecordFromTimeRange(
+                        LocalDateTime.now().minusHours(1), LocalDateTime.now());
+        final List<SubscribedService> subscribersPath =
+                subscribedServicesGateway.getSubscribedServices(ChargingPlugStationEventType.HOURLY);
 
         subscribersPath.forEach(subscriber -> {
             chargingPlugNotificationGateway.notifyChargingPlugStationDailyReport(subscriber.getPath(),
