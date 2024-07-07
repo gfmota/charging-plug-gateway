@@ -40,7 +40,7 @@ public class ChargingPlugDataHubGateway implements ChargingPlugRecordGateway {
     }
 
     @Override
-    public ChargingPlugStationRecord getChargingPlugStationDataRecord(
+    public Optional<ChargingPlugStationRecord> getChargingPlugStationDataRecord(
             final LocalDateTime from, final LocalDateTime to) {
         openDataHubTimeRangeCounter.increment();
         try {
@@ -52,15 +52,15 @@ public class ChargingPlugDataHubGateway implements ChargingPlugRecordGateway {
             chargingPlugStationRecord.setTo(to);
             chargingPlugStationRecord.setFrom(from);
             chargingPlugStationRecord.setStations(mapResponseDtoToChargingPlugStationList(response));
-            return chargingPlugStationRecord;
+            return Optional.of(chargingPlugStationRecord);
         } catch (Exception e) {
             log.warn("Failed to get data from interval {} - {}", from.toString(), to.toString(), e);
-            return null;
+            return Optional.empty();
         }
     }
 
     @Override
-    public ChargingPlugStationCurrentStatus getChargingPlugStationCurrentStatus() {
+    public Optional<ChargingPlugStationCurrentStatus> getChargingPlugStationCurrentStatus() {
         openDataHubLatestCounter.increment();
         try {
             final OpenDataHubMobilityResponseDTO response = openDataHubMobilityClient.getLatestReport();
@@ -68,10 +68,10 @@ public class ChargingPlugDataHubGateway implements ChargingPlugRecordGateway {
             chargingPlugStationCurrentStatus.setMoment(LocalDateTime.now());
             chargingPlugStationCurrentStatus.setStations(
                     mapResponseDtoToChargingPlugStationCurrentStatusList(response));
-            return chargingPlugStationCurrentStatus;
+            return Optional.of(chargingPlugStationCurrentStatus);
         } catch (Exception e) {
             log.warn("Failed to get latest data", e);
-            return null;
+            return Optional.empty();
         }
     }
 
