@@ -6,6 +6,7 @@ import com.template.template.domain.gateways.ChargingPlugRecordGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -19,8 +20,8 @@ public class ChargingPlugRecordUsecase {
     }
 
     public ChargingPlugStationRecord getChargingPlugRecordFromLastDay() {
-        final LocalDateTime now = LocalDateTime.now();
-        return chargingPlugRecordGateway.getChargingPlugStationDataRecord(now.minusDays(1), now);
+        final LocalDateTime today = LocalDate.now().atStartOfDay();
+        return chargingPlugRecordGateway.getChargingPlugStationDataRecord(today.minusDays(1), today);
     }
 
     public ChargingPlugStationCurrentStatus getChargingPlugCurrentStatus() {
