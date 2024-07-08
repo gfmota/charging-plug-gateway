@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController("/")
 @Slf4j
 public class CharginPlugStationController {
@@ -18,12 +20,22 @@ public class CharginPlugStationController {
     @GetMapping("/currentStatus")
     private ResponseEntity<ChargingPlugStationCurrentStatus> getCurrentStatus() {
         log.info("Received current status request");
-        return ResponseEntity.ok(chargingPlugRecordUsecase.getChargingPlugCurrentStatus());
+        final Optional<ChargingPlugStationCurrentStatus> status = chargingPlugRecordUsecase.getChargingPlugCurrentStatus();
+        if (status.isPresent()) {
+            return ResponseEntity.ok(status.get());
+        }
+        log.info("Failed to get current status");
+        return ResponseEntity.internalServerError().build();
     }
 
     @GetMapping("/lastDayReport")
     private ResponseEntity<ChargingPlugStationRecord> getLastDayReport() {
         log.info("Received last day report request");
-        return ResponseEntity.ok(chargingPlugRecordUsecase.getChargingPlugRecordFromLastDay());
+        final Optional<ChargingPlugStationRecord> record = chargingPlugRecordUsecase.getChargingPlugRecordFromLastDay();
+        if (record.isPresent()) {
+            return ResponseEntity.ok(record.get());
+        }
+        log.info("Failed to get last day report");
+        return ResponseEntity.internalServerError().build();
     }
 }
