@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 @Service
 @Slf4j
 public class ChargingPlugStationPublisherUseCase {
@@ -21,7 +23,8 @@ public class ChargingPlugStationPublisherUseCase {
 //    @Scheduled(cron = "0 */5 * * * ?")
     private void notifyLastStatusSubscribers() {
         log.info("Publishing Charging Plug Stations last status");
-        final ChargingPlugStationCurrentStatus currentStatus = chargingPlugRecordUsecase.getChargingPlugCurrentStatus();
+        final ChargingPlugStationCurrentStatus currentStatus = chargingPlugRecordUsecase
+                .getChargingPlugCurrentStatus().orElseThrow();
         chargingPlugPublishGateway.publishChargingPlugStationCurrentStatus(currentStatus);
     }
 
@@ -29,7 +32,8 @@ public class ChargingPlugStationPublisherUseCase {
 //    @Scheduled(cron = "0 0 0 * * ?")
     private void notifyDailySubscribers() {
         log.info("Publishing Charging Plug Stations daily report");
-        final ChargingPlugStationRecord report = chargingPlugRecordUsecase.getChargingPlugRecordFromLastDay();
+        final ChargingPlugStationRecord report = chargingPlugRecordUsecase
+                .getChargingPlugRecordFromLastDay().orElseThrow();
         chargingPlugPublishGateway.publishChargingPlugStationDailyReport(report);
     }
 
