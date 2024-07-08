@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -34,7 +35,9 @@ public class SubscriberUseCase {
 //    @Scheduled(cron = "0 */5 * * * ?")
     private void notifyLastStatusSubscribers() throws IOException {
         log.info("Notifying last status subscribers");
-        final ChargingPlugStationCurrentStatus currentStatus = chargingPlugRecordUsecase.getChargingPlugCurrentStatus();
+        final ChargingPlugStationCurrentStatus currentStatus =
+                chargingPlugRecordUsecase.getChargingPlugCurrentStatus().orElseThrow(IOException::new);
+
         final List<SubscribedService> subscribersPath =
                 subscribedServicesGateway.getSubscribedServices(ChargingPlugStationEventType.LAST_STATUS);
 
@@ -49,7 +52,8 @@ public class SubscriberUseCase {
     private void notifyDailySubscribers() throws IOException {
         log.info("Notifying daily report subscribers");
         final ChargingPlugStationRecord recordFromLastDay =
-                chargingPlugRecordUsecase.getChargingPlugRecordFromLastDay();
+                chargingPlugRecordUsecase.getChargingPlugRecordFromLastDay().orElseThrow(IOException::new);
+
         final List<SubscribedService> subscribersPath =
                 subscribedServicesGateway.getSubscribedServices(ChargingPlugStationEventType.DAILY);
 
