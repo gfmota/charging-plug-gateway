@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface OpenDataHubMobilityClient {
     @GetMapping(value = "/v2/tree%2Cnode/EChargingPlug/%2A/{from}/{to}?limit=200&offset=0&where=sorigin.eq.%22DRIWE%22&shownull=false&distinct=true&timezone=UTC",
             consumes = "application/json")
-    @Cacheable("openDataHubMobilityReportFromTimeRange")
+    @Cacheable(cacheNames = "openDataHubMobilityReportFromTimeRange", key = "#from + '_' + #to")
     OpenDataHubMobilityResponseDTO getReportFromTimeRange(
             @NonNull @PathVariable("from") String from, @NonNull @PathVariable("to") String to);
 
