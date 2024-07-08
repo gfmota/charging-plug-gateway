@@ -38,4 +38,15 @@ public class CharginPlugStationController {
         log.info("Failed to get last day report");
         return ResponseEntity.internalServerError().build();
     }
+
+    @GetMapping("/lastHourReport")
+    private ResponseEntity<ChargingPlugStationRecord> getLastHourReport() {
+        log.info("Received last hour report request");
+        final Optional<ChargingPlugStationRecord> record = chargingPlugRecordUsecase.getChargingPlugRecordFromLastHour();
+        if (record.isPresent()) {
+            return ResponseEntity.ok(record.get());
+        }
+        log.info("Failed to get last hour report");
+        return ResponseEntity.internalServerError().build();
+    }
 }
