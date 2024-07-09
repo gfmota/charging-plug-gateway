@@ -18,6 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -556,6 +557,6 @@
   "timezone": "browser",
   "title": "Broadcaster Gateway Dash",
   "uid": "bdoz05hccbitcd",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
