@@ -25,6 +25,11 @@ public class ChargingPlugRecordUsecase {
         return chargingPlugRecordGateway.getChargingPlugStationDataRecord(today.minusDays(1), today);
     }
 
+    public Optional<ChargingPlugStationRecord> getChargingPlugRecordFromLastHour() {
+        final LocalDateTime now = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+        return chargingPlugRecordGateway.getChargingPlugStationDataRecord(now.minusHours(1), now);
+    }
+
     public Optional<ChargingPlugStationCurrentStatus> getChargingPlugCurrentStatus() {
         return chargingPlugRecordGateway.getChargingPlugStationCurrentStatus();
     }

@@ -19,7 +19,7 @@ public class ChargingPlugStationPublisherUseCase {
     @Autowired
     private ChargingPlugPublishGateway chargingPlugPublishGateway;
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 */3 * * * ?")
 //    @Scheduled(cron = "0 */5 * * * ?")
     private void notifyLastStatusSubscribers() {
         log.info("Publishing Charging Plug Stations last status");
@@ -28,13 +28,22 @@ public class ChargingPlugStationPublisherUseCase {
         chargingPlugPublishGateway.publishChargingPlugStationCurrentStatus(currentStatus);
     }
 
-    @Scheduled(cron = "30 * * * * ?")
+    @Scheduled(cron = "0 1-59/3 * * * ?")
 //    @Scheduled(cron = "0 0 0 * * ?")
     private void notifyDailySubscribers() {
         log.info("Publishing Charging Plug Stations daily report");
         final ChargingPlugStationRecord report = chargingPlugRecordUsecase
                 .getChargingPlugRecordFromLastDay().orElseThrow();
         chargingPlugPublishGateway.publishChargingPlugStationDailyReport(report);
+    }
+
+    @Scheduled(cron = "0 2-59/3 * * * ?")
+//    @Scheduled(cron = "0 0 * * * ?")
+    private void notifyHourlySubscribers() {
+        log.info("Publishing Charging Plug Stations daily report");
+        final ChargingPlugStationRecord report = chargingPlugRecordUsecase
+                .getChargingPlugRecordFromLastHour().orElseThrow();
+        chargingPlugPublishGateway.publishChargingPlugStationHourlyReport(report);
     }
 
 }

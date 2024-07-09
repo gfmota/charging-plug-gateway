@@ -16,6 +16,8 @@ public class ChargingPlugStationMessageProducer implements ChargingPlugPublishGa
     private static final String CHARGING_PLUG_STATION_DAILY_REPORT_ROUTINE_KEY = "charging-plug-station-daily-report";
     private static final String CHARGING_PLUG_STATION_CURRENT_STATUS_ROUTINE_KEY =
             "charging-plug-station-current-status";
+    private static final String CHARGING_PLUG_STATION_HOURLY_REPORT_ROUTINE_KEY =
+            "charging-plug-station-hourly-report";
 
     private MeterRegistry meterRegistry;
     private Counter dailyReportMessagePublishedCounter;
@@ -34,6 +36,12 @@ public class ChargingPlugStationMessageProducer implements ChargingPlugPublishGa
         currentStatusMessagePublishedCounter = Counter.builder("current_status_message_published_counter")
                 .description("Number of messages sent for current status")
                 .register(meterRegistry);
+    }
+
+    @Override
+    public void publishChargingPlugStationHourlyReport(final ChargingPlugStationRecord chargingPlugStationRecord) {
+        rabbitTemplate.convertAndSend(CHARGING_PLUG_STATION_TOPIC,
+                CHARGING_PLUG_STATION_HOURLY_REPORT_ROUTINE_KEY, chargingPlugStationRecord);
     }
 
     @Override
