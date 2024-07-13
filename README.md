@@ -12,6 +12,7 @@ This is a Spring Boot application using:
 * Feign Client to write simple HTTP clients
 * Spring WebClient to write non-blocking concurrent HTTP clients
 * RabbitMQ as asynchronous messaging broker
+* Caffeine to cache methods
 * Spring Boot Actuator to provide metrics data
 * Prometheus to store metrics data
 * Grafana to display metrics data
