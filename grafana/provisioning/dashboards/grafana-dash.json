@@ -535,7 +535,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Passive Gateway Dash",
+  "title": "Polling Gateway Dash",
   "uid": "bdoz05hccbitcd",
   "version": 1,
   "weekStart": ""
