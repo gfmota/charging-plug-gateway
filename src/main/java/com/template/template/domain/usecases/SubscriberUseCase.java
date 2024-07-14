@@ -76,11 +76,16 @@ public class SubscriberUseCase {
 //    @Scheduled(cron = "0 0 1 * * ?")
     private void notifyHourlySubscribers() throws IOException {
         log.info("Notifying hourly report subscribers");
+       final List<SubscribedService> subscribersPath =
+               subscribedServicesGateway.getSubscribedServices(ChargingPlugStationEventType.HOURLY);
+       if (subscribersPath.isEmpty()) {
+           log.info("No subscribers for hourly report");
+           return;
+       }
+
         final ChargingPlugStationRecord recordFromLastDay =
                 chargingPlugRecordUsecase.getChargingPlugRecordFromTimeRange(
                         LocalDateTime.now().minusHours(1), LocalDateTime.now()).orElseThrow(IOException::new);
-        final List<SubscribedService> subscribersPath =
-                subscribedServicesGateway.getSubscribedServices(ChargingPlugStationEventType.HOURLY);
 
         subscribersPath.forEach(subscriber -> {
             chargingPlugNotificationGateway.notifyChargingPlugStationHourlyReport(subscriber.getPath(),
