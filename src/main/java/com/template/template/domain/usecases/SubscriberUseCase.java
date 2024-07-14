@@ -32,7 +32,7 @@ public class SubscriberUseCase {
         subscribedServicesGateway.subscribe(subscribedService);
     }
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "* */5 * * * ?")
 //    @Scheduled(cron = "0 */5 * * * ?")
     private void notifyLastStatusSubscribers() throws IOException {
         log.info("Notifying last status subscribers");
@@ -52,7 +52,7 @@ public class SubscriberUseCase {
         });
     }
 
-    @Scheduled(cron = "30 * * * * ?")
+    @Scheduled(cron = "* */5 * * * ?")
 //    @Scheduled(cron = "0 0 0 * * ?")
     private void notifyDailySubscribers() throws IOException {
         log.info("Notifying daily report subscribers");
@@ -72,13 +72,13 @@ public class SubscriberUseCase {
         });
     }
 
-    @Scheduled(cron = "30 * * * * ?")
+    @Scheduled(cron = "* */5 * * * ?")
 //    @Scheduled(cron = "0 0 1 * * ?")
     private void notifyHourlySubscribers() throws IOException {
         log.info("Notifying hourly report subscribers");
         final ChargingPlugStationRecord recordFromLastDay =
                 chargingPlugRecordUsecase.getChargingPlugRecordFromTimeRange(
-                        LocalDateTime.now().minusHours(1), LocalDateTime.now());
+                        LocalDateTime.now().minusHours(1), LocalDateTime.now()).orElseThrow(IOException::new);
         final List<SubscribedService> subscribersPath =
                 subscribedServicesGateway.getSubscribedServices(ChargingPlugStationEventType.HOURLY);
 
