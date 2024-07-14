@@ -35,11 +35,15 @@ public class SubscriberUseCase {
 //    @Scheduled(cron = "0 */5 * * * ?")
     private void notifyLastStatusSubscribers() throws IOException {
         log.info("Notifying last status subscribers");
-        final ChargingPlugStationCurrentStatus currentStatus =
-                chargingPlugRecordUsecase.getChargingPlugCurrentStatus().orElseThrow(IOException::new);
-
         final List<SubscribedService> subscribersPath =
                 subscribedServicesGateway.getSubscribedServices(ChargingPlugStationEventType.LAST_STATUS);
+        if (subscribersPath.isEmpty()) {
+            log.info("No subscribers for last status");
+            return;
+        }
+
+        final ChargingPlugStationCurrentStatus currentStatus =
+                chargingPlugRecordUsecase.getChargingPlugCurrentStatus().orElseThrow(IOException::new);
 
         subscribersPath.forEach(subscriber -> {
             chargingPlugNotificationGateway.notifyChargingPlugStationCurrentStatus(subscriber.getPath(),
@@ -51,11 +55,15 @@ public class SubscriberUseCase {
 //    @Scheduled(cron = "0 0 0 * * ?")
     private void notifyDailySubscribers() throws IOException {
         log.info("Notifying daily report subscribers");
-        final ChargingPlugStationRecord recordFromLastDay =
-                chargingPlugRecordUsecase.getChargingPlugRecordFromLastDay().orElseThrow(IOException::new);
-
         final List<SubscribedService> subscribersPath =
                 subscribedServicesGateway.getSubscribedServices(ChargingPlugStationEventType.DAILY);
+        if (subscribersPath.isEmpty()) {
+            log.info("No subscribers for daily report");
+            return;
+        }
+
+        final ChargingPlugStationRecord recordFromLastDay =
+                chargingPlugRecordUsecase.getChargingPlugRecordFromLastDay().orElseThrow(IOException::new);
 
         subscribersPath.forEach(subscriber -> {
             chargingPlugNotificationGateway.notifyChargingPlugStationDailyReport(subscriber.getPath(),
