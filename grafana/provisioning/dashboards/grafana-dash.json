@@ -37,8 +37,6 @@
             "axisColorMode": "text",
             "axisLabel": "Percentage",
             "axisPlacement": "auto",
-            "axisSoftMax": 1,
-            "axisSoftMin": 0,
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 0,
@@ -78,13 +76,14 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "percent"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 8,
-        "w": 24,
+        "w": 12,
         "x": 0,
         "y": 0
       },
@@ -109,7 +108,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "process_cpu_usage",
+          "expr": "process_cpu_usage * 100",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -133,7 +132,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
+            "axisLabel": "Percentage",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
@@ -161,7 +160,6 @@
               "mode": "off"
             }
           },
-          "decimals": 0,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -175,104 +173,8 @@
                 "value": 80
               }
             ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
-      },
-      "id": 3,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "maxHeight": 600,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
           },
-          "editorMode": "code",
-          "expr": "sum(http_server_requests_seconds_count{uri=\"/lastDayReport\"}) by (status)",
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "/lastDayReport HTTP Status",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "decimals": 0,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -280,9 +182,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 8
+        "y": 0
       },
-      "id": 2,
+      "id": 6,
       "options": {
         "legend": {
           "calcs": [],
@@ -291,7 +193,6 @@
           "showLegend": true
         },
         "tooltip": {
-          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -303,14 +204,14 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "(sum(http_server_requests_seconds_count{uri=\"/currentStatus\"}) by (status))",
+          "expr": "(sum(jvm_memory_used_bytes{area=\"heap\"}) / sum(jvm_memory_max_bytes{area=\"heap\"})) * 100\n",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "/currentStatus HTTP Requests Status",
+      "title": "Memory Usage",
       "type": "timeseries"
     },
     {
@@ -377,7 +278,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 16
+        "y": 8
       },
       "id": 5,
       "options": {
@@ -402,12 +303,25 @@
           "editorMode": "code",
           "expr": "open_data_hub_last_status_counter_total",
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "Last status",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "open_data_hub_report_counter_total",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Data range",
+          "range": true,
+          "refId": "B"
         }
       ],
-      "title": "Open Data Hub latest status request total",
+      "title": "Data source access",
       "type": "timeseries"
     },
     {
@@ -474,7 +388,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 16
+        "y": 8
       },
       "id": 4,
       "options": {
@@ -497,14 +411,27 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "open_data_hub_report_counter_total",
+          "expr": "daily_report_message_published_counter_total",
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "Daily report",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "current_status_message_published_counter_total",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Current Status",
+          "range": true,
+          "refId": "B"
         }
       ],
-      "title": "Open Data Hub time range report request total",
+      "title": "Message published",
       "type": "timeseries"
     }
   ],
@@ -517,10 +444,9 @@
     "from": "now-5m",
     "to": "now"
   },
-  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "browser",
-  "title": "Passive Gateway Dash",
+  "title": "Message based Gateway Dash",
   "uid": "bdoz05hccbitcd",
   "version": 1,
   "weekStart": ""
