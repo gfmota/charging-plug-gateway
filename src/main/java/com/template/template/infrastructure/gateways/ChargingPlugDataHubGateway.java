@@ -128,7 +128,7 @@ public class ChargingPlugDataHubGateway implements ChargingPlugRecordGateway {
                 if (!stationFound) {
                     final var position = new Coordinates(entry.getValue().getCoordinate().getX(),
                             entry.getValue().getCoordinate().getY());
-                    res.add(new ChargingPlugStation(stationId, position, List.of(plug)));
+                    res.add(new ChargingPlugStation(stationId, position, new ArrayList<>(List.of(plug))));
                 }
             }
         );
