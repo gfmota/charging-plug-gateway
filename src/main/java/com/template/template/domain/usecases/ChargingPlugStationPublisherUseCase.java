@@ -40,7 +40,7 @@ public class ChargingPlugStationPublisherUseCase {
     @Scheduled(cron = "0 */3 * * * ?")
 //    @Scheduled(cron = "0 0 * * * ?")
     private void notifyHourlySubscribers() {
-        log.info("Publishing Charging Plug Stations daily report");
+        log.info("Publishing Charging Plug Stations hourly report");
         final ChargingPlugStationRecord report = chargingPlugRecordUsecase
                 .getChargingPlugRecordFromLastHour().orElseThrow();
         chargingPlugPublishGateway.publishChargingPlugStationHourlyReport(report);
