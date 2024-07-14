@@ -28,7 +28,7 @@ public class ChargingPlugStationPublisherUseCase {
         chargingPlugPublishGateway.publishChargingPlugStationCurrentStatus(currentStatus);
     }
 
-    @Scheduled(cron = "0 1-59/3 * * * ?")
+    @Scheduled(cron = "0 */3 * * * ?")
 //    @Scheduled(cron = "0 0 0 * * ?")
     private void notifyDailySubscribers() {
         log.info("Publishing Charging Plug Stations daily report");
@@ -37,7 +37,7 @@ public class ChargingPlugStationPublisherUseCase {
         chargingPlugPublishGateway.publishChargingPlugStationDailyReport(report);
     }
 
-    @Scheduled(cron = "0 2-59/3 * * * ?")
+    @Scheduled(cron = "0 */3 * * * ?")
 //    @Scheduled(cron = "0 0 * * * ?")
     private void notifyHourlySubscribers() {
         log.info("Publishing Charging Plug Stations daily report");
