@@ -58,6 +58,7 @@ def generate_definitions_json(n):
     for i in range(1, n + 1):
         current_status_queue_name = f"charging-plug-station-current-status-queue-{i}"
         daily_report_queue_name = f"charging-plug-station-daily-report-queue-{i}"
+        hourly_report_queue_name = f"charging-plug-station-hourly-report-queue-{i}"
 
         current_status_queue_entry = {
             "name": current_status_queue_name,
@@ -76,6 +77,15 @@ def generate_definitions_json(n):
             "arguments": {}
         }
         definitions["queues"].append(daily_report_queue_entry)
+
+        hourly_report_queue_entry = {
+            "name": hourly_report_queue_name,
+            "vhost": "/",
+            "durable": True,
+            "auto_delete": False,
+            "arguments": {}
+        }
+        definitions["queues"].append(hourly_report_queue_entry)
 
         current_status_binding_entry = {
             "source": "charging-plug-station-topic",
@@ -96,6 +106,16 @@ def generate_definitions_json(n):
             "arguments": {}
         }
         definitions["bindings"].append(daily_report_binding_entry)
+
+        hourly_report_binding_entry = {
+            "source": "charging-plug-station-topic",
+            "vhost": "/",
+            "destination": hourly_report_queue_entry,
+            "destination_type": "queue",
+            "routing_key": f"charging-plug-station-daily-report",
+            "arguments": {}
+        }
+        definitions["bindings"].append(hourly_report_binding_entry)
 
     return definitions
 

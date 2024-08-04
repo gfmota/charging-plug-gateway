@@ -429,6 +429,19 @@
           "legendFormat": "Current Status",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "hourly_report_message_published_counter_total",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Hourly report",
+          "range": true,
+          "refId": "C"
         }
       ],
       "title": "Message published",
@@ -441,7 +454,7 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-3m",
     "to": "now"
   },
   "timepicker": {},
