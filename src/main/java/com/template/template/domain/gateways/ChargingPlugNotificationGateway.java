@@ -6,4 +6,5 @@ import com.template.template.domain.entity.ChargingPlugStationRecord;
 public interface ChargingPlugNotificationGateway {
     void notifyChargingPlugStationCurrentStatus(String path, String uri, ChargingPlugStationCurrentStatus notification);
     void notifyChargingPlugStationDailyReport(String path, String uri, ChargingPlugStationRecord notification);
+    void notifyChargingPlugStationHourlyReport(String path, String uri, ChargingPlugStationRecord notification);
 }
