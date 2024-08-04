@@ -522,9 +522,22 @@
           "expr": "daily_report_notification_counter_total",
           "hide": false,
           "instant": false,
-          "legendFormat": "Last status",
+          "legendFormat": "Daily report",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "hourly_report_notification_counter_total",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Hourly report",
+          "range": true,
+          "refId": "C"
         }
       ],
       "title": "Notifications sent",
